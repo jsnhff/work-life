@@ -1,23 +1,69 @@
----
-layout: default
----
+<!DOCTYPE html>
+<html class="no-js">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Work Life Tips</title>
+        <meta name="description" content="Work life Tips.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<div class="home">
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
 
-  <h1 class="page-heading">Posts</h1>
+        <link rel="stylesheet" href="libs/big-video-js/css/bigvideo.css">
 
-  <ul class="post-list">
-    {% for post in site.posts %}
-      <li>
-        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+        <script src="js/jquery-2.1.1.min.js"></script>
+        <script src="js/jquery-ui-1.11.2.min.js"></script>
 
-        <h2>
-          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        </h2>
-      </li>
-    {% endfor %}
-  </ul>
+        <!-- Libs & BigVideo Dependencies -->
+        <script src="libs/video-js/video.js"></script>
+        <script src="libs/big-video-js/lib/bigvideo.js"></script>
+        <script src="libs/modernizr.custom.01341.js"></script>
 
-  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
+        <script>
+            $(function() {
+                // Big video full screen background video
+                var BV = new $.BigVideo();
 
-</div>
+                BV.init();
+                if (Modernizr.touch) {
+                    BV.show('image/video-poster.jpg');
+                } else {
+                BV.show(
+                    { type: "video/mp4",  src: "video/chill-short-beach.mp4" },
+                    { type: "video/webm", src: "video/chill-short-beach.webm" },
+                    { type: "video/ogg",  src: "video/chill-short-beach.ogv" }
+                    , {doLoop:true});
+                }
+                
+                // Subtitles
+                var subTitle = $('.sub-title'); 
+                var subtitleFile = "data/phrases.txt";
+                var subtitles = [];
+
+                $.get(subtitleFile, function(txt) {
+                    subtitles = txt.split("\n");
+                }, 'text');
+
+                var runCount = 0;    
+
+                // Subtitle fader
+                function timerMethod() {
+                    runCount++;
+
+                    subTitle.fadeIn();
+                    subTitle.delay(3000).fadeOut('slow', function(){
+                        var rando = Math.floor(Math.random(0) * (subtitles.length-1));
+                        
+                        subTitle.text(subtitles[rando]);
+                        }
+                    );
+                }
+                var timerId = setInterval(timerMethod, 5000);
+            });
+        </script>
+    </head>
+    <body>
+        <h1 class="sub-title">Be an energy landscape.</h1>
+    </body>
+</html>

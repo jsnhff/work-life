@@ -1,0 +1,24 @@
+body {
+    overflow: hidden;
+    background: url("../image/chill-beach-image.jpg") no-repeat;
+    background-size: 100% 100%;
+}
+
+.sub-title {
+    color: yellow;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    position: relative;
+    top: 80%;
+    text-align: center;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 10%;
+    padding-right: 10%;
+    display: none;
+}
+
+/* Hide ugly big video text when video doesn't load */
+.vjs-control-text, .vjs-error-display {
+    display: none;
+}
