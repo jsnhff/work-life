@@ -20,50 +20,50 @@
         <script src="libs/big-video-js/lib/bigvideo.js"></script>
         <script src="libs/modernizr.custom.01341.js"></script>
 
-        <script>
-            $(function() {
-                // Big video full screen background video
-                var BV = new $.BigVideo();
-
-                BV.init();
-                if (Modernizr.touch) {
-                    BV.show('image/video-poster.jpg');
+    </head>
+    <body>
+        <h1 class="sub-title">Be an energy landscape.</h1>
+    </body>
+    <script>
+        $(function() {
+            // Big video full screen background video
+            var BV = new $.BigVideo();
+            BV.init();
+            if (Modernizr.touch) {
+                BV.show('image/chill-beach-image.jpg');
                 } else {
+                $("#big-video-wrap").delay(1000).fadeIn();
                 BV.show(
                     { type: "video/mp4",  src: "video/chill-short-beach.mp4" },
                     { type: "video/webm", src: "video/chill-short-beach.webm" },
                     { type: "video/ogg",  src: "video/chill-short-beach.ogv" }
                     , {doLoop:true});
-                }
-                
-                // Subtitles
-                var subTitle = $('.sub-title'); 
-                var subtitleFile = "data/phrases.txt";
-                var subtitles = [];
+            }
+            
+            // Subtitles
+            var subTitle = $('.sub-title'); 
+            var subtitleFile = "data/phrases.txt";
+            var subtitles = [];
 
-                $.get(subtitleFile, function(txt) {
-                    subtitles = txt.split("\n");
-                }, 'text');
+            $.get(subtitleFile, function(txt) {
+                subtitles = txt.split("\n");
+            }, 'text');
 
-                var runCount = 0;    
+            var runCount = 0;    
 
-                // Subtitle fader
-                function timerMethod() {
-                    runCount++;
+            // Subtitle fader
+            function timerMethod() {
+                runCount++;
 
-                    subTitle.fadeIn();
-                    subTitle.delay(3000).fadeOut('slow', function(){
-                        var rando = Math.floor(Math.random(0) * (subtitles.length-1));
-                        
-                        subTitle.text(subtitles[rando]);
-                        }
-                    );
-                }
-                var timerId = setInterval(timerMethod, 5000);
-            });
-        </script>
-    </head>
-    <body>
-        <h1 class="sub-title">Be an energy landscape.</h1>
-    </body>
+                subTitle.fadeIn();
+                subTitle.delay(3000).fadeOut('slow', function(){
+                    var rando = Math.floor(Math.random(0) * (subtitles.length-1));
+                    
+                    subTitle.text(subtitles[rando]);
+                    }
+                );
+            }
+            var timerId = setInterval(timerMethod, 5000);
+        });
+    </script>
 </html>
