@@ -34,7 +34,7 @@
             if (Modernizr.touch) {
                 BV.show('image/chill-beach-image.jpg');
                 } else {
-                $("#big-video-wrap").delay(1000).fadeIn();
+                $("#big-video-wrap").delay(1500).fadeIn();
                 BV.show(
                     { type: "video/mp4",  src: "video/chill-short-beach.mp4" },
                     { type: "video/webm", src: "video/chill-short-beach.webm" },
@@ -59,7 +59,7 @@
                 runCount++;
 
                 subTitle.fadeIn();
-                subTitle.delay(3000).fadeOut('slow', function(){
+                subTitle.delay(5000).fadeOut('slow', function(){
                     var rando = Math.floor(Math.random(0) * (subtitles.length-1));
                     
                     subTitle.text(subtitles[rando]);
