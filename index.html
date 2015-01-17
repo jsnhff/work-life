@@ -59,14 +59,14 @@
                 runCount++;
 
                 subTitle.fadeIn();
-                subTitle.delay(5000).fadeOut('slow', function(){
+                subTitle.delay(4000).fadeOut('slow', function(){
                     var rando = Math.floor(Math.random(0) * (subtitles.length-1));
                     
                     subTitle.text(subtitles[rando]);
                     }
                 );
             }
-            var timerId = setInterval(timerMethod, 5000);
+            var timerId = setInterval(timerMethod, 8500);
         });
     </script>
 </html>
