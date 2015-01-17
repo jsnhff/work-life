@@ -1,4 +1,4 @@
-body {
+html {
     overflow: hidden;
     background: #000;
 }
@@ -16,13 +16,44 @@ body {
     padding-right: 10%;
     display: none;
 }
+.black-screen {
+    display: none;
+}
+
 
 /* Hide Big video so we can fade it in when the page is loaded */
 #big-video-wrap {
     display: none;
 }
 
+/* Tweak position of Big Video touch image on touch devices. */
+html.touch {
+    background: url(../image/chill-beach-image.jpg) no-repeat center center fixed; 
+    -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+            background-size: cover;
+}
+
+html.touch .black-screen {
+    display: block;
+    background: #000;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
 /* Hide ugly big video text when video doesn't load */
 .vjs-control-text, .vjs-error-display {
     display: none;
+}
+
+@media only screen 
+and (min-device-width : 300px) 
+and (max-device-width : 667px) {
+    .sub-title {
+        font-size: 1.75em;
+    }
 }

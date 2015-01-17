@@ -24,16 +24,17 @@
 
     </head>
     <body>
+        <div class="black-screen"></div>
         <h1 class="sub-title">Be an energy landscape.</h1>
     </body>
     <script>
-        $(function() {
+        $(document).ready(function() {
             // Big video full screen background video
             var BV = new $.BigVideo();
             BV.init();
             if (Modernizr.touch) {
-                BV.show('image/chill-beach-image.jpg');
-                } else {
+                $(".black-screen").delay(1500).fadeOut();
+            } else {
                 $("#big-video-wrap").delay(1500).fadeIn();
                 BV.show(
                     { type: "video/mp4",  src: "video/chill-short-beach.mp4" },
