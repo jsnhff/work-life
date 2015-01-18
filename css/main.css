@@ -46,7 +46,8 @@ html.touch .black-screen {
 }
 
 html.touch body {
-    overflow: hidden;
+    position: absolute;
+    top: 0;
 }
 
 /* Hide ugly big video text when video doesn't load */
