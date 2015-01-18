@@ -28,7 +28,7 @@ html {
 
 /* Tweak position of Big Video touch image on touch devices. */
 html.touch {
-    background: url(../image/chill-beach-image.jpg) no-repeat center center fixed; 
+    background: url(../image/chill-beach-image.gif) no-repeat center center fixed; 
     -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
@@ -55,5 +55,7 @@ and (min-device-width : 300px)
 and (max-device-width : 667px) {
     .sub-title {
         font-size: 1.75em;
+        top: 75%;
+        width: 80%;
     }
 }
