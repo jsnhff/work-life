@@ -45,6 +45,10 @@ html.touch .black-screen {
     left: 0;
 }
 
+html.touch body {
+    overflow: hidden;
+}
+
 /* Hide ugly big video text when video doesn't load */
 .vjs-control-text, .vjs-error-display {
     display: none;
