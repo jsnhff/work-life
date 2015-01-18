@@ -46,8 +46,7 @@ html.touch .black-screen {
 }
 
 html.touch body {
-    position: absolute;
-    top: 0;
+    overflow: hidden;
 }
 
 /* Hide ugly big video text when video doesn't load */
@@ -60,7 +59,9 @@ and (min-device-width : 300px)
 and (max-device-width : 667px) {
     .sub-title {
         font-size: 1.75em;
-        top: 75%;
+        position: fixed;
+        top: initial;
+        bottom: 5%;
         width: 80%;
     }
 }

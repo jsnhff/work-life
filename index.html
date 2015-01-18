@@ -60,8 +60,8 @@
             function timerMethod() {
                 runCount++;
 
-                subTitle.fadeIn();
-                subTitle.delay(4000).fadeOut('slow', function(){
+                subTitle.fadeTo("slow", 1.0);
+                subTitle.delay(4000).fadeTo("slow", 0.0, function(){
                     var rando = Math.floor(Math.random(0) * (subtitles.length-1));
                     
                     subTitle.text(subtitles[rando]);
