@@ -19,6 +19,79 @@
     </body>
     <script src="js/beach.js"></script>
     <script>
+        // --- Ocean audio (Web Audio API procedural synthesis) ---
+        function startOceanAudio() {
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return;
+            var ac = new AC();
+
+            function makeNoise(seconds) {
+                var sr  = ac.sampleRate;
+                var buf = ac.createBuffer(1, sr * seconds, sr);
+                var d   = buf.getChannelData(0);
+                for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+                var src = ac.createBufferSource();
+                src.buffer = buf;
+                src.loop   = true;
+                return src;
+            }
+
+            function lfoTo(target, freq, depth) {
+                var osc = ac.createOscillator();
+                var g   = ac.createGain();
+                osc.frequency.value = freq;
+                g.gain.value        = depth;
+                osc.connect(g);
+                g.connect(target);
+                osc.start();
+            }
+
+            // Layer 1 — deep ocean roar
+            var n1 = makeNoise(4);
+            var f1 = ac.createBiquadFilter();
+            f1.type = 'bandpass'; f1.frequency.value = 320; f1.Q.value = 0.6;
+            lfoTo(f1.frequency, 0.11, 160);
+            var g1 = ac.createGain(); g1.gain.value = 0.55;
+            n1.connect(f1); f1.connect(g1);
+
+            // Layer 2 — wave breaks (mid, slower rhythm)
+            var n2 = makeNoise(6);
+            var f2 = ac.createBiquadFilter();
+            f2.type = 'bandpass'; f2.frequency.value = 650; f2.Q.value = 1.1;
+            lfoTo(f2.frequency, 0.07, 380);
+            var g2 = ac.createGain(); g2.gain.value = 0.35;
+            n2.connect(f2); f2.connect(g2);
+
+            // Layer 3 — foam hiss (high-pass)
+            var n3 = makeNoise(2);
+            var f3 = ac.createBiquadFilter();
+            f3.type = 'highpass'; f3.frequency.value = 2200;
+            var g3 = ac.createGain(); g3.gain.value = 0.09;
+            n3.connect(f3); f3.connect(g3);
+
+            // Master — fade in over 4 s
+            var master = ac.createGain();
+            master.gain.setValueAtTime(0, ac.currentTime);
+            master.gain.linearRampToValueAtTime(0.85, ac.currentTime + 4);
+            g1.connect(master); g2.connect(master); g3.connect(master);
+            master.connect(ac.destination);
+
+            n1.start(); n2.start(); n3.start();
+            return ac;
+        }
+
+        var audioCtx = null;
+        function ensureAudio() {
+            if (audioCtx) return;
+            audioCtx = startOceanAudio();
+        }
+
+        // Try autoplay; browsers may suspend until a gesture
+        try { ensureAudio(); } catch(e) {}
+        // Resume / start on first user interaction if suspended
+        document.addEventListener('click',     function() { ensureAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, { once: true });
+        document.addEventListener('touchstart', function() { ensureAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, { once: true });
+
         // Load phrases and cycle them
         var subTitle = document.querySelector('.sub-title');
         var subtitles = [];

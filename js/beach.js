@@ -256,6 +256,7 @@
   }
 
   // --- Main render loop ---
+  var firstFrame = true;
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -268,6 +269,12 @@
     drawOcean(horizonY, shoreY);
     drawSand(shoreY);
     drawPalm(canvas.width * 0.14, shoreY + 2);
+
+    if (firstFrame) {
+      firstFrame = false;
+      // Trigger CSS fade-in after first painted frame
+      requestAnimationFrame(function () { canvas.style.opacity = 1; });
+    }
 
     t += 0.016;
     requestAnimationFrame(draw);
