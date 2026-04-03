@@ -1,74 +1,64 @@
 <!DOCTYPE html>
-<html class="no-js">
+<html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>Work Life Tips</title>
-        <meta name="description" content="Work life Tips.">
+        <meta name="description" content="Work Life Tips.">
         <meta name="apple-mobile-web-app-title" content="Work Life Tips">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        
-       <link href="data:image/x-icon;base64,AAABAAEAEBAQAAAAAAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAACAEAAAAAAAl9GgAEQGYAA1SHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAERAAAAAAABEREQREREQBERERE0REQxERERERNEQxERERERETRDERERERERNEMREREiERE0QxESESIhETQAESIhIiIRAAASIiEiIiIAMiIiIRIiIiIiIiIRESIiIiIiIRERESIiIiIiERESIiIiIiEREREiIREiERERERERERERHgAwAA8AcAAPgPAAD8HwAA/h8AAP4fAACeHQAAjhgAAIYQAACAAAAAwAEAAOADAAD4AQAA8AMAAPjnAAD//wAA" rel="icon" type="image/x-icon">
-       
+
+        <link href="data:image/x-icon;base64,AAABAAEAEBAQAAAAAAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAACAEAAAAAAAl9GgAEQGYAA1SHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAERAAAAAAABEREQREREQBERERE0REQxERERERNEQxERERERETRDERERERERNEMREREiERE0QxESESIhETQAESIhIiIRAAASIiEiIiIAMiIiIRIiIiIiIiIRESIiIiIiIRERESIiIiIiERESIiIiIiEREREiIREiERERERERERERHgAwAA8AcAAPgPAAD8HwAA/h8AAP4fAACeHQAAjhgAAIYQAACAAAAAwAEAAOADAAD4AQAA8AMAAPjnAAD//wAA" rel="icon" type="image/x-icon">
+
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
-
-        <link rel="stylesheet" href="libs/big-video-js/css/bigvideo.css">
-
-        <script src="js/jquery-2.1.1.min.js"></script>
-        <script src="js/jquery-ui-1.11.2.min.js"></script>
-
-        <!-- Libs & BigVideo Dependencies -->
-        <script src="libs/video-js/video.js"></script>
-        <script src="libs/big-video-js/lib/bigvideo.js"></script>
-        <script src="libs/modernizr.custom.01341.js"></script>
-
     </head>
     <body>
-        <div class="black-screen"></div>
-        <h1 class="sub-title">Be an energy landscape.</h1>
+        <canvas id="beach-canvas"></canvas>
+        <h1 class="sub-title"></h1>
     </body>
+    <script src="js/beach.js"></script>
     <script>
-        $(document).ready(function() {
-            // Big video full screen background video
-            var BV = new $.BigVideo();
-            BV.init();
-            if (Modernizr.touch) {
-                $(".black-screen").delay(1500).fadeOut();
-            } else {
-                $("#big-video-wrap").delay(1500).fadeIn();
-                BV.show(
-                    { type: "video/mp4",  src: "video/chill-short-beach.mp4" },
-                    { type: "video/webm", src: "video/chill-short-beach.webm" },
-                    { type: "video/ogg",  src: "video/chill-short-beach.ogv" }
-                );
-                BV.getPlayer().loop(true);
-            }
-            
-            // Subtitles
-            var subTitle = $('.sub-title'); 
-            var subtitleFile = "data/phrases.txt";
-            var subtitles = [];
+        // Load phrases and cycle them
+        var subTitle = document.querySelector('.sub-title');
+        var subtitles = [];
 
-            $.get(subtitleFile, function(txt) {
-                subtitles = txt.split("\n");
-            }, 'text');
+        function pickPhrase() {
+            if (!subtitles.length) return;
+            var i = Math.floor(Math.random() * subtitles.length);
+            subTitle.textContent = subtitles[i];
+        }
 
-            var runCount = 0;    
+        function fadeIn(el, duration, cb) {
+            el.style.transition = 'opacity ' + (duration / 1000) + 's';
+            el.style.opacity = 1;
+            setTimeout(cb || function(){}, duration);
+        }
 
-            // Subtitle fader
-            function timerMethod() {
-                runCount++;
+        function fadeOut(el, duration, cb) {
+            el.style.transition = 'opacity ' + (duration / 1000) + 's';
+            el.style.opacity = 0;
+            setTimeout(cb || function(){}, duration);
+        }
 
-                subTitle.fadeTo("slow", 1.0);
-                subTitle.delay(4000).fadeTo("slow", 0.0, function(){
-                    var rando = Math.floor(Math.random(0) * (subtitles.length-1));
-                    
-                    subTitle.text(subtitles[rando]);
-                    }
-                );
-            }
-            var timerId = setInterval(timerMethod, 7500);
-        });
+        function cycle() {
+            fadeIn(subTitle, 800, function () {
+                setTimeout(function () {
+                    fadeOut(subTitle, 1200, function () {
+                        pickPhrase();
+                        setTimeout(cycle, 400);
+                    });
+                }, 4000);
+            });
+        }
+
+        fetch('data/phrases.txt')
+            .then(function (r) { return r.text(); })
+            .then(function (txt) {
+                subtitles = txt.split('\n').map(function (s) { return s.trim(); })
+                               .filter(function (s) { return s.length > 0; });
+                pickPhrase();
+                setTimeout(cycle, 1500);
+            });
     </script>
 </html>
