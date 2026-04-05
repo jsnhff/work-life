@@ -1,74 +1,128 @@
 <!DOCTYPE html>
-<html class="no-js">
+<html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>Work Life Tips</title>
-        <meta name="description" content="Work life Tips.">
+        <meta name="description" content="Work Life Tips.">
         <meta name="apple-mobile-web-app-title" content="Work Life Tips">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        
-       <link href="data:image/x-icon;base64,AAABAAEAEBAQAAAAAAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAACAEAAAAAAAl9GgAEQGYAA1SHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAERAAAAAAABEREQREREQBERERE0REQxERERERNEQxERERERETRDERERERERNEMREREiERE0QxESESIhETQAESIhIiIRAAASIiEiIiIAMiIiIRIiIiIiIiIRESIiIiIiIRERESIiIiIiERESIiIiIiEREREiIREiERERERERERERHgAwAA8AcAAPgPAAD8HwAA/h8AAP4fAACeHQAAjhgAAIYQAACAAAAAwAEAAOADAAD4AQAA8AMAAPjnAAD//wAA" rel="icon" type="image/x-icon">
-       
+
+        <link href="data:image/x-icon;base64,AAABAAEAEBAQAAAAAAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAACAEAAAAAAAl9GgAEQGYAA1SHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAERAAAAAAABEREQREREQBERERE0REQxERERERNEQxERERERETRDERERERERNEMREREiERE0QxESESIhETQAESIhIiIRAAASIiEiIiIAMiIiIRIiIiIiIiIRESIiIiIiIRERESIiIiIiERESIiIiIiEREREiIREiERERERERERERHgAwAA8AcAAPgPAAD8HwAA/h8AAP4fAACeHQAAjhgAAIYQAACAAAAAwAEAAOADAAD4AQAA8AMAAPjnAAD//wAA" rel="icon" type="image/x-icon">
+
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
-
-        <link rel="stylesheet" href="libs/big-video-js/css/bigvideo.css">
-
-        <script src="js/jquery-2.1.1.min.js"></script>
-        <script src="js/jquery-ui-1.11.2.min.js"></script>
-
-        <!-- Libs & BigVideo Dependencies -->
-        <script src="libs/video-js/video.js"></script>
-        <script src="libs/big-video-js/lib/bigvideo.js"></script>
-        <script src="libs/modernizr.custom.01341.js"></script>
-
     </head>
     <body>
-        <div class="black-screen"></div>
-        <h1 class="sub-title">Be an energy landscape.</h1>
+        <video id="beach-video" autoplay loop muted playsinline>
+            <source src="video/chill-short-beach.mp4"  type="video/mp4">
+            <source src="video/chill-short-beach.webm" type="video/webm">
+            <source src="video/chill-short-beach.ogv"  type="video/ogg">
+        </video>
+        <h1 class="sub-title"></h1>
     </body>
     <script>
-        $(document).ready(function() {
-            // Big video full screen background video
-            var BV = new $.BigVideo();
-            BV.init();
-            if (Modernizr.touch) {
-                $(".black-screen").delay(1500).fadeOut();
-            } else {
-                $("#big-video-wrap").delay(1500).fadeIn();
-                BV.show(
-                    { type: "video/mp4",  src: "video/chill-short-beach.mp4" },
-                    { type: "video/webm", src: "video/chill-short-beach.webm" },
-                    { type: "video/ogg",  src: "video/chill-short-beach.ogv" }
-                );
-                BV.getPlayer().loop(true);
+        // Fade video in once it's ready
+        var video = document.getElementById('beach-video');
+        video.addEventListener('canplaythrough', function () {
+            video.style.opacity = 1;
+        }, { once: true });
+        // Fallback: fade in after 2s regardless
+        setTimeout(function () { video.style.opacity = 1; }, 2000);
+
+        // --- Ocean audio (Web Audio API) ---
+        function startOceanAudio() {
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return;
+            var ac = new AC();
+
+            function makeNoise(seconds) {
+                var sr  = ac.sampleRate;
+                var buf = ac.createBuffer(1, sr * seconds, sr);
+                var d   = buf.getChannelData(0);
+                for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+                var src = ac.createBufferSource();
+                src.buffer = buf;
+                src.loop   = true;
+                return src;
             }
-            
-            // Subtitles
-            var subTitle = $('.sub-title'); 
-            var subtitleFile = "data/phrases.txt";
-            var subtitles = [];
 
-            $.get(subtitleFile, function(txt) {
-                subtitles = txt.split("\n");
-            }, 'text');
-
-            var runCount = 0;    
-
-            // Subtitle fader
-            function timerMethod() {
-                runCount++;
-
-                subTitle.fadeTo("slow", 1.0);
-                subTitle.delay(4000).fadeTo("slow", 0.0, function(){
-                    var rando = Math.floor(Math.random(0) * (subtitles.length-1));
-                    
-                    subTitle.text(subtitles[rando]);
-                    }
-                );
+            function lfoTo(target, freq, depth) {
+                var osc = ac.createOscillator();
+                var g   = ac.createGain();
+                osc.frequency.value = freq;
+                g.gain.value        = depth;
+                osc.connect(g);
+                g.connect(target);
+                osc.start();
             }
-            var timerId = setInterval(timerMethod, 7500);
-        });
+
+            var n1 = makeNoise(4);
+            var f1 = ac.createBiquadFilter();
+            f1.type = 'bandpass'; f1.frequency.value = 320; f1.Q.value = 0.6;
+            lfoTo(f1.frequency, 0.11, 160);
+            var g1 = ac.createGain(); g1.gain.value = 0.55;
+            n1.connect(f1); f1.connect(g1);
+
+            var n2 = makeNoise(6);
+            var f2 = ac.createBiquadFilter();
+            f2.type = 'bandpass'; f2.frequency.value = 650; f2.Q.value = 1.1;
+            lfoTo(f2.frequency, 0.07, 380);
+            var g2 = ac.createGain(); g2.gain.value = 0.35;
+            n2.connect(f2); f2.connect(g2);
+
+            var n3 = makeNoise(2);
+            var f3 = ac.createBiquadFilter();
+            f3.type = 'highpass'; f3.frequency.value = 2200;
+            var g3 = ac.createGain(); g3.gain.value = 0.09;
+            n3.connect(f3); f3.connect(g3);
+
+            var master = ac.createGain();
+            master.gain.setValueAtTime(0, ac.currentTime);
+            master.gain.linearRampToValueAtTime(0.85, ac.currentTime + 4);
+            g1.connect(master); g2.connect(master); g3.connect(master);
+            master.connect(ac.destination);
+
+            n1.start(); n2.start(); n3.start();
+            return ac;
+        }
+
+        var audioCtx = null;
+        function ensureAudio() {
+            if (audioCtx) return;
+            audioCtx = startOceanAudio();
+        }
+
+        try { ensureAudio(); } catch(e) {}
+        document.addEventListener('click',      function () { ensureAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, { once: true });
+        document.addEventListener('touchstart', function () { ensureAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, { once: true });
+
+        // --- Phrase cycle ---
+        var subTitle = document.querySelector('.sub-title');
+        var subtitles = [];
+
+        function pickPhrase() {
+            if (!subtitles.length) return;
+            subTitle.textContent = subtitles[Math.floor(Math.random() * subtitles.length)];
+        }
+
+        function cycle() {
+            subTitle.style.transition = 'opacity 0.8s';
+            subTitle.style.opacity    = 1;
+            setTimeout(function () {
+                subTitle.style.transition = 'opacity 1.2s';
+                subTitle.style.opacity    = 0;
+                setTimeout(function () { pickPhrase(); setTimeout(cycle, 400); }, 1200);
+            }, 4000);
+        }
+
+        fetch('data/phrases.txt')
+            .then(function (r) { return r.text(); })
+            .then(function (txt) {
+                subtitles = txt.split('\n').map(function (s) { return s.trim(); })
+                               .filter(function (s) { return s.length > 0; });
+                pickPhrase();
+                setTimeout(cycle, 1500);
+            });
     </script>
 </html>
