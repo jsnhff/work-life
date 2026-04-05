@@ -14,12 +14,23 @@
         <link rel="stylesheet" href="css/main.css">
     </head>
     <body>
-        <canvas id="beach-canvas"></canvas>
+        <video id="beach-video" autoplay loop muted playsinline>
+            <source src="video/chill-short-beach.mp4"  type="video/mp4">
+            <source src="video/chill-short-beach.webm" type="video/webm">
+            <source src="video/chill-short-beach.ogv"  type="video/ogg">
+        </video>
         <h1 class="sub-title"></h1>
     </body>
-    <script src="js/beach.js"></script>
     <script>
-        // --- Ocean audio (Web Audio API procedural synthesis) ---
+        // Fade video in once it's ready
+        var video = document.getElementById('beach-video');
+        video.addEventListener('canplaythrough', function () {
+            video.style.opacity = 1;
+        }, { once: true });
+        // Fallback: fade in after 2s regardless
+        setTimeout(function () { video.style.opacity = 1; }, 2000);
+
+        // --- Ocean audio (Web Audio API) ---
         function startOceanAudio() {
             var AC = window.AudioContext || window.webkitAudioContext;
             if (!AC) return;
@@ -46,7 +57,6 @@
                 osc.start();
             }
 
-            // Layer 1 — deep ocean roar
             var n1 = makeNoise(4);
             var f1 = ac.createBiquadFilter();
             f1.type = 'bandpass'; f1.frequency.value = 320; f1.Q.value = 0.6;
@@ -54,7 +64,6 @@
             var g1 = ac.createGain(); g1.gain.value = 0.55;
             n1.connect(f1); f1.connect(g1);
 
-            // Layer 2 — wave breaks (mid, slower rhythm)
             var n2 = makeNoise(6);
             var f2 = ac.createBiquadFilter();
             f2.type = 'bandpass'; f2.frequency.value = 650; f2.Q.value = 1.1;
@@ -62,14 +71,12 @@
             var g2 = ac.createGain(); g2.gain.value = 0.35;
             n2.connect(f2); f2.connect(g2);
 
-            // Layer 3 — foam hiss (high-pass)
             var n3 = makeNoise(2);
             var f3 = ac.createBiquadFilter();
             f3.type = 'highpass'; f3.frequency.value = 2200;
             var g3 = ac.createGain(); g3.gain.value = 0.09;
             n3.connect(f3); f3.connect(g3);
 
-            // Master — fade in over 4 s
             var master = ac.createGain();
             master.gain.setValueAtTime(0, ac.currentTime);
             master.gain.linearRampToValueAtTime(0.85, ac.currentTime + 4);
@@ -86,43 +93,27 @@
             audioCtx = startOceanAudio();
         }
 
-        // Try autoplay; browsers may suspend until a gesture
         try { ensureAudio(); } catch(e) {}
-        // Resume / start on first user interaction if suspended
-        document.addEventListener('click',     function() { ensureAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, { once: true });
-        document.addEventListener('touchstart', function() { ensureAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, { once: true });
+        document.addEventListener('click',      function () { ensureAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, { once: true });
+        document.addEventListener('touchstart', function () { ensureAudio(); if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, { once: true });
 
-        // Load phrases and cycle them
+        // --- Phrase cycle ---
         var subTitle = document.querySelector('.sub-title');
         var subtitles = [];
 
         function pickPhrase() {
             if (!subtitles.length) return;
-            var i = Math.floor(Math.random() * subtitles.length);
-            subTitle.textContent = subtitles[i];
-        }
-
-        function fadeIn(el, duration, cb) {
-            el.style.transition = 'opacity ' + (duration / 1000) + 's';
-            el.style.opacity = 1;
-            setTimeout(cb || function(){}, duration);
-        }
-
-        function fadeOut(el, duration, cb) {
-            el.style.transition = 'opacity ' + (duration / 1000) + 's';
-            el.style.opacity = 0;
-            setTimeout(cb || function(){}, duration);
+            subTitle.textContent = subtitles[Math.floor(Math.random() * subtitles.length)];
         }
 
         function cycle() {
-            fadeIn(subTitle, 800, function () {
-                setTimeout(function () {
-                    fadeOut(subTitle, 1200, function () {
-                        pickPhrase();
-                        setTimeout(cycle, 400);
-                    });
-                }, 4000);
-            });
+            subTitle.style.transition = 'opacity 0.8s';
+            subTitle.style.opacity    = 1;
+            setTimeout(function () {
+                subTitle.style.transition = 'opacity 1.2s';
+                subTitle.style.opacity    = 0;
+                setTimeout(function () { pickPhrase(); setTimeout(cycle, 400); }, 1200);
+            }, 4000);
         }
 
         fetch('data/phrases.txt')
