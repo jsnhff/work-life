@@ -105,15 +105,16 @@
         // --- Phrase cycle ---
         var subTitle = document.querySelector('.sub-title');
         var subtitles = [];
-        var lastPhrase = '';
+        var recentPhrases = [];
+        var RECENT_WINDOW = 4;
 
         function pickPhrase() {
             if (!subtitles.length) return;
-            var next = subtitles[Math.floor(Math.random() * subtitles.length)];
-            if (subtitles.length > 1 && next === lastPhrase) {
-                next = subtitles[(subtitles.indexOf(lastPhrase) + 1 + Math.floor(Math.random() * (subtitles.length - 1))) % subtitles.length];
-            }
-            lastPhrase = next;
+            var pool = subtitles.filter(function (p) { return recentPhrases.indexOf(p) === -1; });
+            if (!pool.length) pool = subtitles;
+            var next = pool[Math.floor(Math.random() * pool.length)];
+            recentPhrases.push(next);
+            if (recentPhrases.length > RECENT_WINDOW) recentPhrases.shift();
             subTitle.textContent = next;
         }
 
